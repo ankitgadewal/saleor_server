@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from PIL import Image
+from django.shortcuts import reverse
 
 dish_type = (('Nonveg', 'N'), ('Veg', 'V'))
 quantity = (('250gm', '250gm'), ('500gm', '500gm'), ('1kg', '1kg'), ('1', '1'))
@@ -8,9 +9,11 @@ quantity = (('250gm', '250gm'), ('500gm', '500gm'), ('1kg', '1kg'), ('1', '1'))
 class Item(models.Model):
     title = models.CharField(max_length=100)
     price = models.FloatField()
+    discount_price = models.FloatField(blank=True, null=True)
     veg_or_nonveg = models.CharField(choices=dish_type, max_length=20)
     quantity = models.CharField(choices=quantity, max_length=20)
     image = models.ImageField(upload_to='dish_images', default='default.jpg')
+    slug = models.SlugField()
 
     def save(self):
         super().save()
@@ -20,14 +23,32 @@ class Item(models.Model):
             img.thumbnail(output_size)
             img.save(self.image.path)
 
+    def get_absolute_url(self):
+        return reverse("restaurant:dish", kwargs={
+            'slug': self.slug
+        })
+
+    def get_add_to_cart_url(self):
+        return reverse("restaurant:add-to-cart", kwargs={
+            'slug': self.slug
+        })
+    
+    def get_remove_from_cart_url(self):
+        return reverse("restaurant:remove-from-cart", kwargs={
+            'slug': self.slug
+        })
+
     def __str__(self):
         return self.title
 
 class OrderItem(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    cartitem = models.IntegerField(default=1)
+    ordered = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.item
+        return f"new order is {self.item.title} from {self.user.username} cart {self.cartitem} "
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
