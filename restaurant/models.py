@@ -47,8 +47,22 @@ class OrderItem(models.Model):
     cartitem = models.IntegerField(default=1)
     ordered = models.BooleanField(default=False)
 
+    def get_total_item_price(self):
+        return self.cartitem * self.item.price
+
+    def get_total_item_discount_price(self):
+        return self.cartitem * self.item.discount_price
+
+    def save_on_bill(self):
+        return self.get_total_item_price() - self.get_total_item_discount_price()
+
+    def get_final_price(self):
+        if self.item.discount_price:
+            return self.get_total_item_discount_price()
+        return self.get_total_item_price()
+
     def __str__(self):
-        return f"new order is {self.item.title} from {self.user.username} cart {self.cartitem} "
+        return f"new order is {self.item.title} from {self.user.username} cart {self.cartitem}"
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -57,6 +71,12 @@ class Order(models.Model):
     order_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
 
+    def get_total(self):
+        total = 0
+        for order_item in self.items.all():
+            total += order_item.get_final_price()
+        return total
+        
     def __str__(self):
         return self.user.username
     

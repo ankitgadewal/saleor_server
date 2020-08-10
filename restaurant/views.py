@@ -1,24 +1,37 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, View
 from .models import Item, Order, OrderItem
 from django.utils import timezone
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class HomeView(ListView):
     model = Item
     template_name = 'restaurant/home-page.html'
 
-
+@login_required
 def checkout(request):
     return render(request, 'restaurant/checkout-page.html')
-
 
 class DishDetailView(DetailView):
     model = Item
     template_name = 'restaurant/dish-page.html'
+    context_object_name = 'item'
 
+class OrderSummaryView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            return render(self.request, 'restaurant/order-summary.html', {'object':order})
+        except ObjectDoesNotExist:
+            messages.error(self.request, "Your cart is empty")
+            return redirect('/')
+        return render(self.request, 'restaurant/order-summary.html')
 
+@login_required
 def add_to_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
     order_item, created = OrderItem.objects.get_or_create(
@@ -46,7 +59,7 @@ def add_to_cart(request, slug):
         messages.info(request, "Item added to your cart")
     return redirect("restaurant:dish", slug=slug)
 
-
+@login_required
 def remove_from_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
     order_qs = Order.objects.filter(user=request.user, ordered=False)
