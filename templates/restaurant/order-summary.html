@@ -26,7 +26,10 @@
                             {% else %}
                             {{order_item.item.price}}
                             {% endif %}</td>
-                        <td>{{order_item.cartitem}}</td>
+                        <td><a href="{% url 'restaurant:remove_single_item_from_cart' order_item.item.slug %}"><i class="fa fa-minus mr-2" aria-hidden="true"></i></a>
+                            {{order_item.cartitem}} 
+                            <a href="{% url 'restaurant:add-to-cart' order_item.item.slug %}"><i class="fa fa-plus ml-2" aria-hidden="true"></i></a>
+                        </td>
                         <td>Rs.
                             {% if order_item.item.discount_price %}
                             {{order_item.get_total_item_discount_price}}
@@ -34,6 +37,10 @@
                             {% else %}
                             {{order_item.get_total_item_price}}
                             {% endif %}
+                        <a href="{% url 'restaurant:remove-from-cart' order_item.item.slug %}">
+                            <i style="color: red;" class="fa fa-trash float-right" aria-hidden="true"></i>
+
+                        </a>
                         </td>
                     </tr>
                     {% empty %}

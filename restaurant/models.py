@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from PIL import Image
 from django.shortcuts import reverse
+from django_countries.fields import CountryField
 
 dish_type = (('Nonveg', 'N'), ('Veg', 'V'))
 quantity = (('250gm', '250gm'), ('500gm', '500gm'), ('1kg', '1kg'), ('1', '1'))
@@ -70,6 +71,7 @@ class Order(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     order_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
+    billing_address = models.ForeignKey('BillingAddress', on_delete=models.SET_NULL, blank=True, null=True)
 
     def get_total(self):
         total = 0
@@ -79,4 +81,13 @@ class Order(models.Model):
         
     def __str__(self):
         return self.user.username
-    
+
+class BillingAddress(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    street_address = models.CharField(max_length=100)
+    apartment_address = models.CharField(max_length=100)
+    country = CountryField(multiple=False)
+    zipcode = models.CharField(max_length=10)
+
+    def __str(self):
+        return self.user.username
