@@ -1,16 +1,29 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, View
+from django.views.generic import ListView, DetailView, View, TemplateView
 from .models import Item, Order, OrderItem, BillingAddress
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
-from . forms import CheckoutForm
+from . forms import CheckoutForm, UserUpdateForm
 
 class HomeView(ListView):
     model = Item
     template_name = 'restaurant/home-page.html'
+
+class ProfileView(View):
+    def get(self, *args, **kwargs):
+        u_form = UserUpdateForm(instance=self.request.user)
+        return render(self.request, 'restaurant/profile.html', {'u_form':u_form})
+
+    def post(self, *args, **kwargs):
+        if self.request.method == 'POST':
+            u_form = UserUpdateForm(self.request.POST, instance=self.request.user)
+            if u_form.is_valid():
+                u_form.save()
+                messages.success(self.request, 'Your Profile has been Updated Successfully')
+                return redirect('restaurant:profile')
 
 class CheckoutView(View):
     def get(self, *args, **kwargs):
@@ -46,8 +59,10 @@ class CheckoutView(View):
         except ObjectDoesNotExist:
             messages.error(self.request, "Your cart is empty")
             return redirect('restaurant:order-summary')
-        
-        
+
+class PaymentView(View):
+    def get(self, *args, **kwargs):
+        return render(self.request, 'restaurant/payment.html')
 
 class DishDetailView(DetailView):
     model = Item

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block body %}
+{% load crispy_forms_tags %}
+<main class="mt-5 pt-4 pb-3 mb-4">
+    <div class="container">
+        <section class="mb-4 mt-2">
+            <div class="row">
+                <div class="col-lg text-center mt-5 pt-4 mb-4">
+                    <h2>welcome {{request.user.username}}</h2>
+                    <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+                        <a href="{% url 'account_change_password' %}" type="button" class="btn btn-primary">Change Password</a>
+                        <a href="{% url 'account_email' %}" type="button" class="btn btn-primary">Add Emails</a>
+                    </div>
+                </div>
+
+                <div class="col-lg text-center">
+                    <form method="POST", enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <fieldset class="form-group">
+                            <legend class="border-bottom mb-4">Update Profile</legend>
+                            {{ u_form|crispy }}
+                            
+                        </fieldset>
+                        <div class="form-group">
+                            <button class="btn btn-outline-info" type="submit">Update</button> <br>
+                            
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock body %}
