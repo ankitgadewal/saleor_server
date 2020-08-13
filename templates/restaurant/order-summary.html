@@ -43,6 +43,18 @@
                         </a>
                         </td>
                     </tr>
+                    {% if object.coupon %}
+                    <tr>
+                        <td colspan="4"><b>Coupon</b></td>
+                        <td><strong>- {{object.coupon.amount}} ({{object.coupon.code}})</strong></td>
+                    </tr>
+                    {% endif %}
+
+                    <tr>
+                        <td colspan="4"><b>Order Total</b></td>
+                        <td><strong>Total Rs. {{object.get_total}}/-</strong></td>
+                    </tr>
+                    
                     {% empty %}
                     <tr>
                         <td colspan="5"><b>Your Cart is empty</b></td>
@@ -55,12 +67,8 @@
                     {% endfor %}
 
                     
-                    
                     {% if object.get_total %}
-                    <tr>
-                        <td colspan="4"><b>Order Total</b></td>
-                        <td><strong>Total Rs. {{object.get_total}}</strong></td>
-                    </tr>
+                    
                     <tr>
                         <td colspan="5">
                             <a href="/checkout" class="btn btn-info float-right ml-2">Proceed to Checkout</a>

@@ -33,3 +33,11 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email']
+
+class CouponForm(forms.Form):
+    code = forms.CharField(widget=forms.TextInput(attrs={
+        'placeholder': 'Promo Code',
+        'class':'form-control',
+        'aria-label':"Recipient's username",
+        'aria-describedby':"basic-addon2"
+    }))
