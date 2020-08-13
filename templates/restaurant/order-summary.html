@@ -43,17 +43,7 @@
                         </a>
                         </td>
                     </tr>
-                    {% if object.coupon %}
-                    <tr>
-                        <td colspan="4"><b>Coupon</b></td>
-                        <td><strong>- {{object.coupon.amount}} ({{object.coupon.code}})</strong></td>
-                    </tr>
-                    {% endif %}
-
-                    <tr>
-                        <td colspan="4"><b>Order Total</b></td>
-                        <td><strong>Total Rs. {{object.get_total}}/-</strong></td>
-                    </tr>
+                    
                     
                     {% empty %}
                     <tr>
@@ -65,9 +55,21 @@
                         </td>
                     </tr>
                     {% endfor %}
-
                     
-                    {% if object.get_total %}
+                    {% if object.items.all.count != 0 %}
+                    {% if object.coupon %}
+                    <tr>
+                        <td colspan="4"><b>Coupon</b></td>
+                        <td><strong>- {{object.coupon.amount}} ({{object.coupon.code}})</strong></td>
+                    </tr>
+                    
+                    {% endif %}
+                    <tr>
+                        <td colspan="4"><b>Order Total</b></td>
+                        <td><strong>Total Rs. {{object.get_total}}/-</strong></td>
+                    </tr>
+                    {%endif %}
+                    {% if object.get_total > 1 %}
                     
                     <tr>
                         <td colspan="5">

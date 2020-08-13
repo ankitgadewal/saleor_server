@@ -73,7 +73,7 @@ class PaymentView(View):
     def get(self, *args, **kwargs):
         order = Order.objects.get(user=self.request.user, ordered=False)
         if order.billing_address:
-            return render(self.request, 'restaurant/payment.html')
+            return render(self.request, 'restaurant/payment.html', {'STRIPE_PUBLIC_KEY' : settings.STRIPE_PUBLIC_KEY})
         else:
             messages.warning(self.request, 'please add a billing address')
             return redirect('restaurant:checkOut')
@@ -84,11 +84,10 @@ class PaymentView(View):
         amount = int(order.get_total())
 
         try:
-            stripe.Charge.create(
+            charge = stripe.Charge.create(
                 amount=amount,
                 currency="inr",
                 source= token,
-                customer  = stripe_customer.id,
             )
 
             # save payments to our database
