@@ -73,7 +73,9 @@
               </div>
               
               <hr class="mb-4">
+              <form action="{% url 'restaurant:checkOut' %}" method="POST">{% csrf_token %}
               <button class="btn btn-primary btn-lg btn-block" type="submit">Pay Rs. {{order.get_total}}/-</button>
+            </form>
             </form>
           </div>
         </div>

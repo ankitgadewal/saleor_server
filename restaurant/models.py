@@ -13,16 +13,16 @@ class Item(models.Model):
     discount_price = models.FloatField(blank=True, null=True)
     veg_or_nonveg = models.CharField(choices=dish_type, max_length=20)
     quantity = models.CharField(choices=quantity, max_length=20)
-    image = models.ImageField(upload_to='dish_images', default='default.jpg')
+    image_url = models.URLField()
     slug = models.SlugField()
 
-    def save(self):
-        super().save()
-        img = Image.open(self.image.path)
-        if img.height > 300 or img.width > 300:
-            output_size = (300,300)
-            img.thumbnail(output_size)
-            img.save(self.image.path)
+    # def save(self):
+    #     super().save()
+    #     img = Image.open(self.image.path)
+    #     if img.height > 300 or img.width > 300:
+    #         output_size = (300,300)
+    #         img.thumbnail(output_size)
+    #         img.save(self.image.path)
 
     def get_absolute_url(self):
         return reverse("restaurant:dish", kwargs={

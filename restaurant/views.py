@@ -42,6 +42,7 @@ class CheckoutView(View):
         form = CheckoutForm(self.request.POST or None)
         try:
             order = Order.objects.get(user=self.request.user, ordered=False)
+            print(order)
             if form.is_valid():
                 street_address = form.cleaned_data.get('street_address')
                 apartment_address = form.cleaned_data.get('apartment_address')
@@ -58,9 +59,10 @@ class CheckoutView(View):
                     zipcode=zipcode
                 )
                 billing_address.save()
+                print(order)
                 order.billing_address = billing_address
                 order.save()
-                return redirect('restaurant:checkOut')
+                return redirect('restaurant:payment')
             messages.info(self.request, 'checkout failed')
             return redirect('restaurant:checkOut')
 
@@ -155,6 +157,7 @@ class DishDetailView(DetailView):
     context_object_name = 'item'
 
 
+
 class OrderSummaryView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         try:
@@ -180,12 +183,12 @@ def add_to_cart(request, slug):
         if order.items.filter(item__slug=item.slug).exists():
             order_item.cartitem += 1
             order_item.save()
-            messages.info(request, "Item added to your cart")
+            messages.info(request, "Item Quantity Updated")
             return redirect("restaurant:order-summary")
         else:
             order.items.add(order_item)
             messages.info(request, "Item added to your cart")
-            return redirect("restaurant:dish", slug=slug)
+            return redirect("restaurant:homePage")
     else:
         ordered_date = timezone.now()
         order = Order.objects.create(
@@ -195,7 +198,7 @@ def add_to_cart(request, slug):
         order.items.add(order_item)
         messages.info(request, "Item added to your cart")
         return redirect("restaurant:order-summary")
-    return redirect("restaurant:dish", slug=slug)
+    return redirect("restaurant:homePage")
 
 
 @login_required
@@ -215,11 +218,11 @@ def remove_from_cart(request, slug):
             return redirect("restaurant:order-summary")
         else:
             messages.info(request, "not an active order to your cart")
-            return redirect("restaurant:dish", slug=slug)
+            return redirect("restaurant:homePage")
     else:
         messages.info(request, "no orders found")
-        return redirect("restaurant:dish", slug=slug)
-    return redirect("restaurant:dish", slug=slug)
+        return redirect("restaurant:homePage")
+    return redirect("restaurant:homePage")
 
 
 @login_required

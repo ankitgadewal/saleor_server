@@ -12,7 +12,7 @@
       <!--Grid column-->
       <div class="col-md-6 mb-4">
 
-        <img src="{{item.image.url}}" class="img-fluid img-thumbnail" alt="">
+        <img src="{{item.image_url}}" class="img-fluid img-thumbnail" alt="">
 
       </div>
       <!--Grid column-->
@@ -32,7 +32,7 @@
           <p class="lead">
             <span class="mr-1">
             {% if item.discount_price %}
-              <del>Rs. {{item.discount_price}}</del> <span>Rs. {{item.price}}/-</span>
+              <del>Rs. {{item.price}}</del> <span>Rs. {{item.discount_price}}/-</span>
             {% else %}
               <span>Rs. {{item.price}}/-</span>
             {% endif %}
@@ -45,9 +45,7 @@
           <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Et dolor suscipit libero eos atque quia ipsa
             sint voluptatibus!
             Beatae sit assumenda asperiores iure at maxime atque repellendus maiores quia sapiente.</p>
-            
           <a href="{{ item.get_add_to_cart_url }}" class="btn btn-primary btn-md my-0 p">Add to Cart <i class="fas fa-shopping-cart ml-1"></i></a>
-          <a href="{{ item.get_remove_from_cart_url }}" class="btn btn-danger btn-md my-0 p">remove from Cart</a>
 
         </div>
         <!--Content-->
