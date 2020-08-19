@@ -55,7 +55,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'restaurant',
         'USER': 'postgres',
-        'PASSWORD': 'ilikethis',
+        'PASSWORD': '',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -108,7 +108,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ankitgadewal.84@gmail.com'
-EMAIL_HOST_PASSWORD = 'dfnasxmcbmoihzmy'
+EMAIL_HOST_PASSWORD = ''
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 ACCOUNT_EMAIL_REQUIRED = True
