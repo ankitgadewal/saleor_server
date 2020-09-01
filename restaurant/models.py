@@ -102,9 +102,6 @@ class Payment(models.Model):
     amount = models.FloatField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.user.username
-
 class Coupon(models.Model):
     code = models.CharField(max_length=15)
     amount = models.FloatField()

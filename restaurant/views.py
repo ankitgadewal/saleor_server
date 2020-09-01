@@ -214,6 +214,7 @@ def remove_from_cart(request, slug):
                 ordered=False
             )[0]
             order.items.remove(order_item)
+            order_item.delete()
             messages.info(request, "Item removed from your cart")
             return redirect("restaurant:order-summary")
         else:
