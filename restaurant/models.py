@@ -67,13 +67,19 @@ class OrderItem(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    ref_code = models.CharField(max_length=20, blank=True, null=True)
     items = models.ManyToManyField(OrderItem)
     start_date = models.DateTimeField(auto_now_add=True)
     order_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
     billing_address = models.ForeignKey('BillingAddress', on_delete=models.SET_NULL, blank=True, null=True)
+    # shipping_address = models.CharField(max_length=20, blank=True, null=True)
     payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, blank=True, null=True)
     coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL, blank=True, null=True)
+    being_delivered = models.BooleanField(default=False)
+    received = models.BooleanField(default=False)
+    refund_requested = models.BooleanField(default=False)
+    refund_granted = models.BooleanField(default=False)
 
     def get_total(self):
         total = 0
@@ -93,8 +99,11 @@ class BillingAddress(models.Model):
     country = CountryField(multiple=False)
     zipcode = models.CharField(max_length=10)
 
-    def __str(self):
-        return self.user.username
+    def __str__(self):
+        return self.street_address
+    
+    class Meta:
+        verbose_name_plural = 'Addresses'
 
 class Payment(models.Model):
     stripe_charge_id = models.CharField(max_length=100)
@@ -102,9 +111,21 @@ class Payment(models.Model):
     amount = models.FloatField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.stripe_charge_id
+
 class Coupon(models.Model):
     code = models.CharField(max_length=15)
     amount = models.FloatField()
 
     def __str__(self):
         return self.code
+
+class Refund(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    reason = models.TextField()
+    accepted = models.BooleanField(default=False)
+    email = models.EmailField()
+
+    def __str__(self):
+        return f"{self.pk}"

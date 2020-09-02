@@ -108,7 +108,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ankitgadewal.84@gmail.com'
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_PASSWORD = 'dfnasxmcbmoihzmy'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 ACCOUNT_EMAIL_REQUIRED = True

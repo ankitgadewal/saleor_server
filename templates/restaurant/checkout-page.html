@@ -6,6 +6,12 @@
       <h2 class="my-5 h2 text-center">Checkout form</h2>
       <div class="row">
         <div class="col-md-8 mb-4">
+          {% if oldaddress %}
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" name="use_old" id="use_default_shipping">
+                <label class="custom-control-label" for="use_default_shipping">Used Address is {{ oldaddress.street_address }}</label>
+              </div>
+          {% endif %}
 
           <!--Card-->
           <div class="card">
