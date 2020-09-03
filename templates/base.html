@@ -10,9 +10,8 @@
   <title>{% block head_title %}{% endblock %}</title>
   {% block extra_head %}
   {% endblock %}
-  <link rel="icon" 
-      type="image/png" 
-      href="https://restaurant.eatapp.co/hs-fs/hubfs/256_256.png?width=256&name=256_256.png">
+  <link rel="icon" type="image/png"
+    href="https://restaurant.eatapp.co/hs-fs/hubfs/256_256.png?width=256&name=256_256.png">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
   <!-- Bootstrap core CSS -->
@@ -77,27 +76,46 @@
         </ul>
 
         <!-- Right -->
-        <ul class="navbar-nav nav-flex-icons">
+        <ul class="navbar-nav">
           {% if request.user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link waves-effect" href="{% url 'restaurant:order-summary' %}">
+            <a class="nav-link" href="{% url 'restaurant:order-summary' %}">
               <span class="badge red z-depth-1 mr-1"> {{request.user|cart_item_count}} </span>
               <i class="fas fa-shopping-cart"></i>
-              <span class="clearfix d-none d-sm-inline-block"> Cart </span>
+              <span class="clearfix"> Cart </span>
             </a>
           </li>
 
-          <li class="nav-item">
-            <a class="nav-link waves-effect" href="{% url 'account_logout' %}">
-              <span class="clearfix d-none d-sm-inline-block"> Logout </span>
-            </a>
-          </li>
+
 
           <li class="nav-item">
-            <a class="nav-link waves-effect" href="{% url 'restaurant:profile' %}">
-              <span class="clearfix d-none d-sm-inline-block"> My Profile </span>
-            </a>
+
+            <div class="dropdown show">
+              <a class="nav-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <b>{{request.user.username}}</b>
+              </a>
+
+              <div class="dropdown-menu text-center" aria-labelledby="dropdownMenuLink">
+                <a class="nav-link" href="{% url 'restaurant:profile' %}">
+                  <span class="clearfix"> My Profile </span>
+                </a>
+                <a class="nav-link" href="{% url 'restaurant:myOrders' %}">
+                  <span class="clearfix"> My Orders </span>
+                </a>
+                <a class="nav-link" href="{% url 'restaurant:request-refund' %}">
+                  <span class="clearfix"> Request For Refund</span>
+                </a>
+                <a class="nav-link" href="{% url 'account_logout' %}">
+                  <span class="clearfix"> Logout </span>
+                </a>
+              </div>
+            </div>
+
           </li>
+
+
+
 
           {% else %}
           <li class="nav-item">
@@ -111,20 +129,20 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link waves-effect" href="{% url 'account_login' %}">
-              <span class="clearfix d-none d-sm-inline-block"> Login </span>
+            <a class="nav-link" href="{% url 'account_login' %}">
+              <span class="clearfix"> Login </span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link waves-effect" href="{% url 'account_signup' %}">
-              <span class="clearfix d-none d-sm-inline-block"> SignUp </span>
+            <a class="nav-link" href="{% url 'account_signup' %}">
+              <span class="clearfix"> SignUp </span>
             </a>
           </li>
 
           {% endif %}
           <li class="nav-item">
-            <a href="https://github.com/ankitgadewal" class="nav-link border border-light rounded waves-effect"
-              target="_blank">
+            <a href="https://github.com/ankitgadewal/Saleor_Restaurant_Django"
+              class="nav-link border border-light rounded waves-effect" target="_blank">
               <i class="fab fa-github mr-2"></i>Saleor GitHub
             </a>
           </li>

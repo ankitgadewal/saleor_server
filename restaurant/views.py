@@ -8,20 +8,23 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from . forms import CheckoutForm, UserUpdateForm, CouponForm, RefundForm
+from django.core.mail import send_mail
 import stripe
 import random
 import string
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+
 def create_ref_code():
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
+
 
 class HomeView(ListView):
     model = Item
     template_name = 'restaurant/home-page.html'
 
 
-class ProfileView(View):
+class ProfileView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         u_form = UserUpdateForm(instance=self.request.user)
         return render(self.request, 'restaurant/profile.html', {'u_form': u_form})
@@ -36,10 +39,9 @@ class ProfileView(View):
             return redirect('restaurant:profile')
 
 
-class CheckoutView(View):
+class CheckoutView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         try:
-
             form = CheckoutForm()
             order = Order.objects.get(user=self.request.user, ordered=False)
             context = {
@@ -53,7 +55,8 @@ class CheckoutView(View):
 
             return render(self.request, 'restaurant/checkout-page.html', context)
         except ObjectDoesNotExist:
-            messages.warning(self.request, 'please add some items to your cart before checkout')
+            messages.warning(
+                self.request, 'please add some items to your cart before checkout')
             return redirect('restaurant:homePage')
 
     def post(self, *args, **kwargs):
@@ -66,9 +69,6 @@ class CheckoutView(View):
                 apartment_address = form.cleaned_data.get('apartment_address')
                 country = form.cleaned_data.get('country')
                 zipcode = form.cleaned_data.get('zipcode')
-                # same_billing_address = form.cleaned_data.get('same_billing_address')
-                # save_info = form.cleaned_data.get('save_info')
-                payment_option = form.cleaned_data.get('payment_option')
                 billing_address = BillingAddress(
                     user=self.request.user,
                     street_address=street_address,
@@ -77,7 +77,6 @@ class CheckoutView(View):
                     zipcode=zipcode
                 )
                 billing_address.save()
-                print(order)
                 order.billing_address = billing_address
                 order.save()
                 return redirect('restaurant:payment')
@@ -89,14 +88,28 @@ class CheckoutView(View):
             return redirect('restaurant:order-summary')
 
 
-class PaymentView(View):
+def save_addr(request):
+    found_address = BillingAddress.objects.filter(
+        user=request.user, street_address=request.POST['street_address'])[0]
+    order = Order.objects.get(user=request.user, ordered=False)
+    order.billing_address = found_address
+    order.save()
+    return redirect('restaurant:payment')
+
+
+class PaymentView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
-        order = Order.objects.get(user=self.request.user, ordered=False)
-        if order.billing_address:
-            return render(self.request, 'restaurant/payment.html', {'STRIPE_PUBLIC_KEY' : settings.STRIPE_PUBLIC_KEY})
-        else:
-            messages.warning(self.request, 'please add a billing address')
-            return redirect('restaurant:checkOut')
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            if order.billing_address:
+                return render(self.request, 'restaurant/payment.html', {'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY, 'order': order})
+            else:
+                messages.warning(self.request, 'please add a billing address')
+                return redirect('restaurant:checkOut')
+        except ObjectDoesNotExist:
+            messages.warning(
+                self.request, 'You don\'t have any item in your cart')
+            return redirect('/')
 
     def post(self, *args, **kwargs):
         order = Order.objects.get(user=self.request.user, ordered=False)
@@ -107,12 +120,12 @@ class PaymentView(View):
             charge = stripe.Charge.create(
                 amount=amount,
                 currency="inr",
-                source= token,
+                source=token,
             )
 
             # save payments to our database
             payment = Payment()
-            
+
             payment.stripe_charge_id = charge['id']
             payment.amount = order.get_total()
             payment.user = self.request.user
@@ -121,17 +134,24 @@ class PaymentView(View):
             order_items = order.items.all()
             order_items.update(ordered=True)
             for item in order_items:
-                 item.save()
+                item.save()
 
             # assigning the payment to the order
             order.ordered = True
             order.payment = payment
             order.ref_code = create_ref_code()
             order.save()
+            send_mail(
+                'Congratulations!! Order placed',
+                f'hello sir we are very happy to say that your order is suucessfully placed and we received Rs {payment.amount} Your order will be deliverd asap Happy Shopping.',
+                'ankitgadewal11@gmail.com',
+                ['alkeshk99@gmail.com'],
+                fail_silently=False,
+            )
             messages.success(self.request, "your payment was sucessful")
             return redirect('/')
- 
-        except stripe.error.CardError as e:            
+
+        except stripe.error.CardError as e:
             messages.error(self.request, e.error.message)
             return redirect('/')
 
@@ -142,7 +162,6 @@ class PaymentView(View):
 
         except stripe.error.InvalidRequestError as e:
             # Invalid parameters were supplied to Stripe's API
-            print(e)
             messages.warning(self.request, "invalid request")
             return redirect('/')
 
@@ -164,9 +183,9 @@ class PaymentView(View):
             return redirect('/')
 
         except Exception as e:
-            print(e)
             # Something else happened, completely unrelated to Stripe
-            messages.error(self.request, "something serious error, we will be notified...")
+            messages.error(
+                self.request, "something serious error, we will be notified...")
             return redirect('/')
 
 
@@ -175,6 +194,15 @@ class DishDetailView(DetailView):
     template_name = 'restaurant/dish-page.html'
     context_object_name = 'item'
 
+
+class MyOrdersView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        orderitem = Order.objects.filter(
+            user=self.request.user, ordered=True)[::-1]
+        context = {
+            'orderitem': orderitem
+        }
+        return render(self.request, 'restaurant/my_orders.html', context)
 
 
 class OrderSummaryView(LoginRequiredMixin, View):
@@ -202,7 +230,8 @@ def add_to_cart(request, slug):
         if order.items.filter(item__slug=item.slug).exists():
             order_item.cartitem += 1
             order_item.save()
-            messages.info(request, "Item Quantity Updated")
+            messages.info(
+                request, f"{order_item.item.title} Quantity Updated to {order_item.cartitem}")
             return redirect("restaurant:order-summary")
         else:
             order.items.add(order_item)
@@ -234,7 +263,8 @@ def remove_from_cart(request, slug):
             )[0]
             order.items.remove(order_item)
             order_item.delete()
-            messages.info(request, "Item removed from your cart")
+            messages.info(
+                request, f"You've removed {order_item.item.title} from your cart")
             return redirect("restaurant:order-summary")
         else:
             messages.info(request, "not an active order to your cart")
@@ -260,10 +290,16 @@ def remove_single_item_from_cart(request, slug):
             if order_item.cartitem > 1:
                 order_item.cartitem -= 1
                 order_item.save()
+                messages.info(
+                    request, f"You've changed {order_item.item.title} QUANTITY to {order_item.cartitem}")
+                return redirect("restaurant:order-summary")
             else:
                 order.items.remove(order_item)
-            messages.info(request, "Item quantity updated")
-            return redirect("restaurant:order-summary")
+                order_item.delete()
+                messages.info(
+                    request, f"You've removed {order_item.item.title} from your cart")
+                return redirect("restaurant:order-summary")
+
         else:
             messages.info(request, "not an active order to your cart")
             return redirect("restaurant:order-summary")
@@ -272,22 +308,27 @@ def remove_single_item_from_cart(request, slug):
         return redirect("restaurant:dish", slug=slug)
     return redirect("restaurant:dish", slug=slug)
 
+
 class AddCouponView(View):
     def post(self, *args, **kwargs):
         form = CouponForm(self.request.POST or None)
         if form.is_valid():
             try:
                 code = form.cleaned_data.get('code')
-                order = Order.objects.get(user=self.request.user, ordered=False)
+                order = Order.objects.get(
+                    user=self.request.user, ordered=False)
                 order.coupon = Coupon.objects.get(code=code)
                 order.save()
-                messages.success(self.request, "Voila!! Successfully applied Coupon Code")
+                messages.success(
+                    self.request, f"Voila!! Successfully applied Coupon Code {order.coupon}")
                 return redirect("restaurant:checkOut")
             except ObjectDoesNotExist:
-                messages.warning(self.request, "The Coupon is invalid or Expired")
+                messages.warning(
+                    self.request, f"The Coupon {order.coupon} is invalid or Expired")
                 return redirect("restaurant:checkOut")
 
-class RequestRefundView(View):
+
+class RequestRefundView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         form = RefundForm()
         context = {
@@ -301,13 +342,11 @@ class RequestRefundView(View):
             ref_code = form.cleaned_data.get('ref_code')
             message = form.cleaned_data.get('message')
             email = form.cleaned_data.get('email')
-            # edit the order
             try:
                 order = Order.objects.get(ref_code=ref_code)
                 order.refund_requested = True
                 order.save()
 
-                # store the refund
                 refund = Refund()
                 refund.order = order
                 refund.reason = message

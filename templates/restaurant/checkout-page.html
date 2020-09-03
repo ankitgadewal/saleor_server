@@ -1,62 +1,71 @@
 {% extends 'base.html' %}
 {% block body %}
 {% load crispy_forms_tags %}
-  <main>
-    <div class="container wow fadeIn">
-      <h2 class="my-5 h2 text-center">Checkout form</h2>
-      <div class="row">
-        <div class="col-md-8 mb-4">
-          {% if oldaddress %}
-              <div class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" name="use_old" id="use_default_shipping">
-                <label class="custom-control-label" for="use_default_shipping">Used Address is {{ oldaddress.street_address }}</label>
-              </div>
-          {% endif %}
+<main>
+  <div class="container wow fadeIn">
+    <h2 class="my-5 h2 text-center">Checkout form</h2>
+    <div class="row">
+      <div class="col-md-8 mb-4">
 
-          <!--Card-->
-          <div class="card">
-            <!--Card content-->
-            <form class="card-body" method="POST">
-              {% csrf_token %}
+        {% if oldaddress %}
+        <h5><b> Recently used address is</b></h5>
+        <form action="{% url 'restaurant:save_addr' %}" method="POST">{% csrf_token %}
+        <input type="hidden" name="street_address" value="{{oldaddress.street_address}}">
+        {{ oldaddress.street_address }} {{oldaddress.apartment_address}} {{oldaddress.country}}
+          {{oldaddress.zipcode}} 
+          <button type="submit" class="btn btn-primary btn-sm">Continue with the address</button></p>
+        <h5><b> or fill out new address</b></h5>
+        <hr>
+        </form>
+        {% endif %}
 
-              <!--address-->
-              <div class="md-form mb-5">
-                <!-- <input type="text" id="address" class="form-control" placeholder="1234 Main St"> -->
-                {{form.street_address}}
-                <label for="address" class="">Address</label>
-              </div>
+        
 
-              <!--address-2-->
-              <div class="md-form mb-5">
-                <!-- <input type="text" id="address-2" class="form-control" placeholder="Apartment or suite"> -->
-                {{form.apartment_address}}
-                <label for="address-2" class="">Address 2 (optional)</label>
-              </div>
 
-              <!--Grid row-->
-              <div class="row">
+        <!--Card-->
+        <div class="card">
+          <!--Card content-->
+          <form class="card-body" method="POST">
+            {% csrf_token %}
 
-                <!--Grid column-->
-                <div class="col-lg-6 col-md-12 mb-4">
+            <!--address-->
+            <div class="md-form mb-5">
+              <!-- <input type="text" id="address" class="form-control" placeholder="1234 Main St"> -->
+              {{form.street_address}}
+              <label for="address" class="">Address</label>
+            </div>
 
-                  <label for="country">Country</label>
-                  {{ form.country }}
-                  <div class="invalid-feedback">
-                    Please select a valid country.
-                  </div>
+            <!--address-2-->
+            <div class="md-form mb-5">
+              <!-- <input type="text" id="address-2" class="form-control" placeholder="Apartment or suite"> -->
+              {{form.apartment_address}}
+              <label for="address-2" class="">Address 2 (optional)</label>
+            </div>
 
+            <!--Grid row-->
+            <div class="row">
+
+              <!--Grid column-->
+              <div class="col-lg-6 col-md-12 mb-4">
+
+                <label for="country">Country</label>
+                {{ form.country }}
+                <div class="invalid-feedback">
+                  Please select a valid country.
                 </div>
-                <div class="col-lg-6 col-md-6 mb-4">
 
-                  <label for="zip">Zip</label>
-                  {{form.zipcode}}
-                  <div class="invalid-feedback">
-                    Zip code required.
-                  </div>
+              </div>
+              <div class="col-lg-6 col-md-6 mb-4">
+
+                <label for="zip">Zip</label>
+                {{form.zipcode}}
+                <div class="invalid-feedback">
+                  Zip code required.
                 </div>
               </div>
+            </div>
 
-              <hr>
+            <!-- <hr>
 
               <div class="custom-control custom-checkbox">
                 <input {% if form.same_billing_address %}checked{% endif %} type="checkbox" class="custom-control-input" name="same_billing_address" id="same-address">
@@ -67,84 +76,86 @@
                 <label class="custom-control-label" for="save-info">Save this information for next time</label>
               </div>
 
-              <hr>
-              
-              <div class="d-block my-3">
-                {% for value, name in form.fields.payment_option.choices %}
-                <div class="custom-control custom-radio">
-                  <input id="{{name}}" name="payment_option" type="radio" value="{{value}}" class="custom-control-input" checked required>
-                  <label class="custom-control-label" for="{{name}}">{{name}}</label>
-                </div>
-                {% endfor %}
+              <hr> -->
+
+            <!-- <div class="d-block my-3">
+              {% for value, name in form.fields.payment_option.choices %}
+              <div class="custom-control custom-radio">
+                <input id="{{name}}" name="payment_option" type="radio" value="{{value}}" class="custom-control-input"
+                  checked required>
+                <label class="custom-control-label" for="{{name}}">{{name}}</label>
               </div>
-              
-              <hr class="mb-4">
-              <form action="{% url 'restaurant:checkOut' %}" method="POST">{% csrf_token %}
+              {% endfor %}
+            </div> -->
+
+            <hr class="mb-4">
+            <form action="{% url 'restaurant:checkOut' %}" method="POST">{% csrf_token %}
               <button class="btn btn-primary btn-lg btn-block" type="submit">Pay Rs. {{order.get_total}}/-</button>
             </form>
-            </form>
-          </div>
+          </form>
         </div>
+      </div>
 
-        <!--Grid column-->
-        <div class="col-md-4 mb-4">
+      <!--Grid column-->
+      <div class="col-md-4 mb-4">
 
-          <!-- Heading -->
-          <h4 class="d-flex justify-content-between align-items-center mb-3">
-            <span class="text-muted">Your cart</span>
-            <span class="badge badge-secondary badge-pill">{{order.items.cartitem}}</span>
-          </h4>
-          
+        <!-- Heading -->
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-muted">Your cart</span>
+          <span class="badge badge-secondary badge-pill">{{order.items.cartitem}}</span>
+        </h4>
 
-          <!-- Cart -->
-          <ul class="list-group mb-3 z-depth-1">
-            {% for order_item in order.items.all %}
-            
+
+        <!-- Cart -->
+        <ul class="list-group mb-3 z-depth-1">
+          {% for order_item in order.items.all %}
+
           <li class="list-group-item d-flex justify-content-between lh-condensed">
             <div>
-              <h6 class="my-0">{{ order_item.cartitem }} x {{ order_item.item.title}} ({{order_item.item.quantity}})</h6>
+              <h6 class="my-0">{{ order_item.cartitem }} x {{ order_item.item.title}} ({{order_item.item.quantity}})
+              </h6>
               <small class="text-muted">{{ order_item.item.description}}</small>
             </div>
             <span class="text-muted"> Rs. {{ order_item.get_final_price }}/-</span>
           </li>
           {% endfor %}
           {% if order.coupon %}
-            <li class="list-group-item d-flex justify-content-between">
-              <div class="text-success">
-                <h6 class="my-0">Promo code</h6>
-                {{order.coupon.code}}
-              </div>
-              <span class="text-danger">-Rs. {{order.coupon.amount}}/-</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Total (INR)</span>
-              <strong>Rs. {{order.get_total}}/-</strong>
-            </li>
-            {% endif %}
-          </ul>
-          <!-- Cart -->
-
-          <!-- Promo code -->
-          <form class="card p-2" action="{% url 'restaurant:add-coupon' %}" method="POST">
-            {% csrf_token %}
-            <div class="input-group">
-              <!-- <input type="text" class="form-control" placeholder="Promo code" aria-label="Recipient's username" aria-describedby="basic-addon2"> -->
-              {{couponform.code}}
-              <div class="input-group-append">
-                <button class="btn btn-secondary btn-md waves-effect m-0" type="submit">Redeem</button>
-              </div>
+          <li class="list-group-item d-flex justify-content-between">
+            <div class="text-success">
+              <h6 class="my-0">Promo code</h6>
+              {{order.coupon.code}}
             </div>
-          </form>
-          <!-- Promo code -->
+            <span class="text-danger">-Rs. {{order.coupon.amount}}/-</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Total (INR)</span>
+            <strong>Rs. {{order.get_total}}/-</strong>
+          </li>
+          {% endif %}
+        </ul>
+        <!-- Cart -->
 
-        </div>
-        <!--Grid column-->
+        <!-- Promo code -->
+        <form class="card p-2" action="{% url 'restaurant:add-coupon' %}" method="POST">
+          {% csrf_token %}
+          <div class="input-group">
+            <!-- <input type="text" class="form-control" placeholder="Promo code" aria-label="Recipient's username" aria-describedby="basic-addon2"> -->
+            {{couponform.code}}
+            <div class="input-group-append">
+              <button class="btn btn-secondary btn-md waves-effect m-0" type="submit">Redeem</button>
+            </div>
+          </div>
+        </form>
+        <!-- Promo code -->
 
       </div>
-      <!--Grid row-->
+      <!--Grid column-->
 
     </div>
-  </main>
-  <!--Main layout-->
+    <!--Grid row-->
+
+  </div>
+</main>
+<!--Main layout-->
 
 {% endblock body %}

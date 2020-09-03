@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+<main>
+    <div class="container-fluid">
+        <section class="mb-4 mt-2">
+            <div class="row fadeIn wow">
+                <div class="col-sm-12 col-lg-12">
+                    <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">S.no</th>
+                            <th scope="col">Items</th>
+                            <th scope="col">ref_code</th>
+                            <th scope="col">Order Date</th>
+                            <th scope="col">Address</th>
+                            <th scope="col">Payment</th>
+                            <th scope="col">Applied Coupon</th>
+                            <th scope="col">delivered</th>
+                          </tr>
+                        </thead>
+                        {% for item in orderitem %}
+                        <tbody>
+                          <tr>
+                            <th scope="row">{{forloop.counter}}</th>
+                            <th>
+                            {% for i in item.items.all %}
+                              <p> {{i.cartitem}} x {{i}}</p>
+                            {% endfor %}
+                          </th>
+                            <td>{{item.ref_code}}</td>
+                            <td>{{item.order_date}}</td>
+                            <td>{{item.billing_address}}</td>
+                            <td>{{item.payment.amount}}/-</td>
+                            <td>{{item.coupon}}</td>
+                            <td>{{item.status}}</td>
+                          </tr>
+                        </tbody>
+                        {% endfor %}
+                      </table>
+                    
+                    
+                    
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+{% endblock %}

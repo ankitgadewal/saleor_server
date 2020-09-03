@@ -63,23 +63,23 @@ class OrderItem(models.Model):
         return self.get_total_item_price()
 
     def __str__(self):
-        return f"new order is {self.item.title} from {self.user.username} cart {self.cartitem}"
+        return f"{self.item.title}"
+
+order_status = (('order_accepted','order_accepted'), ('order_cancelled', 'order_cancelled'), ('on_the_way', 'on_the_way'), ('delivered', 'delivered'))
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     ref_code = models.CharField(max_length=20, blank=True, null=True)
     items = models.ManyToManyField(OrderItem)
-    start_date = models.DateTimeField(auto_now_add=True)
     order_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
     billing_address = models.ForeignKey('BillingAddress', on_delete=models.SET_NULL, blank=True, null=True)
-    # shipping_address = models.CharField(max_length=20, blank=True, null=True)
     payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, blank=True, null=True)
     coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL, blank=True, null=True)
-    being_delivered = models.BooleanField(default=False)
-    received = models.BooleanField(default=False)
+    status = models.CharField(max_length=50, choices=order_status)
     refund_requested = models.BooleanField(default=False)
     refund_granted = models.BooleanField(default=False)
+    refund_completed = models.BooleanField(default=False)
 
     def get_total(self):
         total = 0
@@ -89,8 +89,8 @@ class Order(models.Model):
             total -= self.coupon.amount
         return total
         
-    def __str__(self):
-        return self.user.username
+    # def __str__(self):
+    #     return self.user.username
 
 class BillingAddress(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

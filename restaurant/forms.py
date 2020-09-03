@@ -23,10 +23,6 @@ class CheckoutForm(forms.Form):
     zipcode = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
     }))
-    same_billing_address = forms.BooleanField(required=False, widget=forms.CheckboxInput())
-    save_info = forms.BooleanField(required=False, widget=forms.CheckboxInput())
-    payment_option = forms.ChoiceField(widget=forms.RadioSelect, choices= PAYMENT_CHOICES)
-
 
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField(required=None)
@@ -43,7 +39,9 @@ class CouponForm(forms.Form):
     }))
 
 class RefundForm(forms.Form):
-    ref_code = forms.CharField()
+    ref_code = forms.CharField(widget=forms.TextInput(attrs={
+        'placeholder': 'You can get order reference id from order history page',
+    }))
     message = forms.CharField(widget=forms.Textarea(attrs={
         'rows': 4
     }))
