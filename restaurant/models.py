@@ -65,7 +65,7 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.item.title}"
 
-order_status = (('order_accepted','order_accepted'), ('order_cancelled', 'order_cancelled'), ('on_the_way', 'on_the_way'), ('delivered', 'delivered'))
+order_status = (('not_accepted', 'not_accepted'),('order_accepted','order_accepted'), ('order_cancelled', 'order_cancelled'), ('on_the_way', 'on_the_way'), ('delivered', 'delivered'))
 
 class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -76,7 +76,7 @@ class Order(models.Model):
     billing_address = models.ForeignKey('BillingAddress', on_delete=models.SET_NULL, blank=True, null=True)
     payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, blank=True, null=True)
     coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL, blank=True, null=True)
-    status = models.CharField(max_length=50, choices=order_status)
+    status = models.CharField(max_length=50, choices=order_status, default='not_accepted')
     refund_requested = models.BooleanField(default=False)
     refund_granted = models.BooleanField(default=False)
     refund_completed = models.BooleanField(default=False)
@@ -117,6 +117,8 @@ class Payment(models.Model):
 class Coupon(models.Model):
     code = models.CharField(max_length=15)
     amount = models.FloatField()
+    min_order_value = models.FloatField(default=10, null=True, blank=True)
+    expire_in = models.DateTimeField()
 
     def __str__(self):
         return self.code

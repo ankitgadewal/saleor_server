@@ -14,8 +14,9 @@
         {{ oldaddress.street_address }} {{oldaddress.apartment_address}} {{oldaddress.country}}
           {{oldaddress.zipcode}} 
           <button type="submit" class="btn btn-primary btn-sm">Continue with the address</button></p>
+          <hr>
         <h5><b> or fill out new address</b></h5>
-        <hr>
+        
         </form>
         {% endif %}
 
@@ -65,29 +66,6 @@
               </div>
             </div>
 
-            <!-- <hr>
-
-              <div class="custom-control custom-checkbox">
-                <input {% if form.same_billing_address %}checked{% endif %} type="checkbox" class="custom-control-input" name="same_billing_address" id="same-address">
-                <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
-              </div>
-              <div class="custom-control custom-checkbox">
-                <input {% if form.save_info.value %}checked{% endif %} type="checkbox" class="custom-control-input" id="save-info" name="same-address">
-                <label class="custom-control-label" for="save-info">Save this information for next time</label>
-              </div>
-
-              <hr> -->
-
-            <!-- <div class="d-block my-3">
-              {% for value, name in form.fields.payment_option.choices %}
-              <div class="custom-control custom-radio">
-                <input id="{{name}}" name="payment_option" type="radio" value="{{value}}" class="custom-control-input"
-                  checked required>
-                <label class="custom-control-label" for="{{name}}">{{name}}</label>
-              </div>
-              {% endfor %}
-            </div> -->
-
             <hr class="mb-4">
             <form action="{% url 'restaurant:checkOut' %}" method="POST">{% csrf_token %}
               <button class="btn btn-primary btn-lg btn-block" type="submit">Pay Rs. {{order.get_total}}/-</button>
@@ -101,7 +79,7 @@
 
         <!-- Heading -->
         <h4 class="d-flex justify-content-between align-items-center mb-3">
-          <span class="text-muted">Your cart</span>
+          <span class="h2">Your cart</span>
           <span class="badge badge-secondary badge-pill">{{order.items.cartitem}}</span>
         </h4>
 
@@ -123,9 +101,10 @@
           <li class="list-group-item d-flex justify-content-between">
             <div class="text-success">
               <h6 class="my-0">Promo code</h6>
-              {{order.coupon.code}}
+              {{order.coupon.code}} <a href="{% url 'restaurant:remove-coupon' %}"><i style="color: red;" class="fa fa-trash ml-3" aria-hidden="true"></i></a>
             </div>
-            <span class="text-danger">-Rs. {{order.coupon.amount}}/-</span>
+            <span class="text-danger">-Rs. {{order.coupon.amount}}/- </span>
+            
           </li>
           <li class="list-group-item d-flex justify-content-between">
             <span>Total (INR)</span>
@@ -139,7 +118,6 @@
         <form class="card p-2" action="{% url 'restaurant:add-coupon' %}" method="POST">
           {% csrf_token %}
           <div class="input-group">
-            <!-- <input type="text" class="form-control" placeholder="Promo code" aria-label="Recipient's username" aria-describedby="basic-addon2"> -->
             {{couponform.code}}
             <div class="input-group-append">
               <button class="btn btn-secondary btn-md waves-effect m-0" type="submit">Redeem</button>
@@ -147,6 +125,37 @@
           </div>
         </form>
         <!-- Promo code -->
+        <h4 class="mt-5 h3">Promo Codes</h4>
+        <section class="mb-4 mt-2">
+          <div class="row fadeIn wow">
+              <div class="col-sm-12 col-lg-12">
+                  <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th scope="col">Code</th>
+                          <th scope="col">Upto</th>
+                          <th scope="col">Min Order</th>
+                          <th scope="col">Expires on</th>
+                        </tr>
+                      </thead>
+                      {% for coupon in coupons %}
+                      <tbody>
+                        <tr>
+                          <td><b>{{coupon.code}}</b></td>
+                          <td>{{coupon.amount}}/-</td>
+                          <td>{{coupon.min_order_value}}/-</td>
+                          <td>{{coupon.expire_in}}</td>
+                          
+                        </tr>
+                      </tbody>
+                      {% endfor %}
+                    </table>
+                  
+                  
+                  
+              </div>
+          </div>
+      </section>
 
       </div>
       <!--Grid column-->

@@ -43,11 +43,13 @@ class CheckoutView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         try:
             form = CheckoutForm()
+            coupons = Coupon.objects.all()
             order = Order.objects.get(user=self.request.user, ordered=False)
             context = {
                 'form': form,
                 'order': order,
-                'couponform': CouponForm()
+                'couponform': CouponForm(),
+                'coupons': coupons
             }
             oldaddress = BillingAddress.objects.filter(user=self.request.user)
             if oldaddress.exists():
@@ -317,16 +319,29 @@ class AddCouponView(View):
                 code = form.cleaned_data.get('code')
                 order = Order.objects.get(
                     user=self.request.user, ordered=False)
-                order.coupon = Coupon.objects.get(code=code)
-                order.save()
-                messages.success(
-                    self.request, f"Voila!! Successfully applied Coupon Code {order.coupon}")
-                return redirect("restaurant:checkOut")
+                applied_code = Coupon.objects.get(code=code)
+                if order.get_total() > applied_code.min_order_value:
+                    order.coupon = Coupon.objects.get(code=code)
+                    order.save()
+                    messages.success(
+                        self.request, f"Voila!! Successfully applied Coupon Code {order.coupon}")
+                    return redirect("restaurant:checkOut")
+                else:
+                    messages.warning(
+                        self.request, f"can\'t applied Coupon Code. amount should be greater than {applied_code.min_order_value}/-")
+                    return redirect("restaurant:checkOut")
             except ObjectDoesNotExist:
                 messages.warning(
                     self.request, f"The Coupon {order.coupon} is invalid or Expired")
                 return redirect("restaurant:checkOut")
 
+class RemoveCouponView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        order = Order.objects.get(user=self.request.user, ordered=False)
+        order.coupon = None
+        order.save()
+        messages.success(self.request, f"promocode removed")
+        return redirect("restaurant:checkOut")
 
 class RequestRefundView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
