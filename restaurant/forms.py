@@ -16,6 +16,10 @@ class CheckoutForm(forms.Form):
         'placeholder': 'Apartment or Suite',
         'class':'form-control'
     }))
+    contact_no = forms.IntegerField(widget=forms.TextInput(attrs={
+        'placeholder': 'Contact Number',
+        'class':'form-control'
+    }))
     country = CountryField(blank_label='(Select Country)').formfield(
         widget=CountrySelectWidget(attrs={
             'class': 'custom-select d-block w-100'

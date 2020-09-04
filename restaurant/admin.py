@@ -44,6 +44,7 @@ class AddressAdmin(admin.ModelAdmin):
         'user',
         'street_address',
         'apartment_address',
+        'contact_no',
         'country',
         'zipcode',
     ]

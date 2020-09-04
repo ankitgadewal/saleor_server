@@ -12,7 +12,7 @@
         <form action="{% url 'restaurant:save_addr' %}" method="POST">{% csrf_token %}
         <input type="hidden" name="street_address" value="{{oldaddress.street_address}}">
         {{ oldaddress.street_address }} {{oldaddress.apartment_address}} {{oldaddress.country}}
-          {{oldaddress.zipcode}} 
+          {{oldaddress.zipcode}} {{oldaddress.contact_no}} 
           <button type="submit" class="btn btn-primary btn-sm">Continue with the address</button></p>
           <hr>
         <h5><b> or fill out new address</b></h5>
@@ -41,6 +41,12 @@
               <!-- <input type="text" id="address-2" class="form-control" placeholder="Apartment or suite"> -->
               {{form.apartment_address}}
               <label for="address-2" class="">Address 2 (optional)</label>
+            </div>
+
+            <div class="md-form mb-5">
+              <!-- <input type="text" id="address-2" class="form-control" placeholder="Apartment or suite"> -->
+              {{form.contact_no}}
+              <label for="contact_no" class="">Contact Number</label>
             </div>
 
             <!--Grid row-->
@@ -106,11 +112,12 @@
             <span class="text-danger">-Rs. {{order.coupon.amount}}/- </span>
             
           </li>
+          
+          {% endif %}
           <li class="list-group-item d-flex justify-content-between">
             <span>Total (INR)</span>
             <strong>Rs. {{order.get_total}}/-</strong>
           </li>
-          {% endif %}
         </ul>
         <!-- Cart -->
 

@@ -70,12 +70,14 @@ class CheckoutView(LoginRequiredMixin, View):
                 street_address = form.cleaned_data.get('street_address')
                 apartment_address = form.cleaned_data.get('apartment_address')
                 country = form.cleaned_data.get('country')
+                contact_no = form.cleaned_data.get('contact_no')
                 zipcode = form.cleaned_data.get('zipcode')
                 billing_address = BillingAddress(
                     user=self.request.user,
                     street_address=street_address,
                     apartment_address=apartment_address,
                     country=country,
+                    contact_no=contact_no,
                     zipcode=zipcode
                 )
                 billing_address.save()

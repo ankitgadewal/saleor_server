@@ -96,6 +96,7 @@ class BillingAddress(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     street_address = models.CharField(max_length=100)
     apartment_address = models.CharField(max_length=100)
+    contact_no = models.BigIntegerField(blank=True, null=True)
     country = CountryField(multiple=False)
     zipcode = models.CharField(max_length=10)
 
