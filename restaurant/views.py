@@ -14,7 +14,6 @@ import random
 import string
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
-
 def create_ref_code():
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
 
@@ -322,7 +321,7 @@ class AddCouponView(View):
                 order = Order.objects.get(
                     user=self.request.user, ordered=False)
                 applied_code = Coupon.objects.get(code=code)
-                if order.get_total() > applied_code.min_order_value:
+                if order.get_total() >= applied_code.min_order_value:
                     order.coupon = Coupon.objects.get(code=code)
                     order.save()
                     messages.success(

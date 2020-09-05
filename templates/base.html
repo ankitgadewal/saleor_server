@@ -2,6 +2,8 @@
 <html lang="en">
 {% load static %}
 {% load cart_template_tags %}
+{% load socialaccount %}
+{% providers_media_js %}
 
 <head>
   <meta charset="utf-8">
@@ -119,9 +121,8 @@
 
           {% else %}
           <li class="nav-item">
-            <a href="{% static '' %}" class="nav-link waves-effect" target="_blank">
-              <i class="fab fa-facebook-f"></i>
-            </a>
+              <a href="/accounts/facebook/login/" class="nav-link waves-effect">
+              <i class="fab fa-facebook-f"></i></a>
           </li>
           <li class="nav-item">
             <a href="{% static '' %}" class="nav-link waves-effect" target="_blank">
