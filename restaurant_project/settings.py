@@ -36,7 +36,7 @@ ROOT_URLCONF = 'restaurant_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -53,12 +53,8 @@ WSGI_APPLICATION = 'restaurant_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'saleorrestaurant',
-        'USER': 'postgres',
-        'PASSWORD': 'ilikethis',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -107,8 +103,8 @@ SOCIALACCOUNT_PROVIDERS = \
         'VERIFIED_EMAIL': False,
         'VERSION': 'v2.4'}}
 
-SOCIAL_AUTH_FACEBOOK_KEY = '319908848994168'
-SOCIAL_AUTH_FACEBOOK_SECRET = '842f75fd238ac6fdd3a9d904a29ab9a8'
+SOCIAL_AUTH_FACEBOOK_KEY = '333372524478232'
+SOCIAL_AUTH_FACEBOOK_SECRET = 'b5af6c66a9a5c1b4979503c57541f514'
 
 LANGUAGE_CODE = 'en-us'
 
@@ -122,6 +118,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
@@ -141,7 +138,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'True'
 
 STRIPE_PUBLIC_KEY = 'pk_test_51HFHPuHQz45koituZPey3ghCNf9sSxqEhquhFapNPPGYyNfS3IpYBwNoz1MRhTzBMtzrRBLIGaRmlPN9waILLPRv00DZOIzRmu'
 STRIPE_SECRET_KEY = 'sk_test_51HFHPuHQz45koitub5QRFJUtkrLmEQ4zezd7FWF8e2A8X7gMGD5kzYepCBFaLDADetq2t56485aVNpQNl7CASLca00kXKsrXju'
