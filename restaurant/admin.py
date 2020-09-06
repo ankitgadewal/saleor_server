@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Item, OrderItem, Order, Payment, BillingAddress, Coupon
+from .models import Item, OrderItem, Order, Payment, BillingAddress, Coupon, ContactUs
 
 def make_refund_accepted(admin, modeladmin, queryset):
     queryset.update(refund_requested=False, refund_granted=True)
@@ -81,6 +81,14 @@ class ItemAdmin(admin.ModelAdmin):
         'quantity',
     ]
 
+class ContactAdmin(admin.ModelAdmin):
+    list_display = [
+        'customer_name',
+        'query',
+        'mobile_no',
+        'timestamp'
+    ]
+
 
 admin.site.register(Item, ItemAdmin)
 admin.site.register(Coupon, CouponAdmin)
@@ -88,3 +96,4 @@ admin.site.register(Payment, PaymentAdmin)
 admin.site.register(OrderItem, OrderItemsAdmin)
 admin.site.register(BillingAddress, AddressAdmin)
 admin.site.register(Order, OrderAdmin)
+admin.site.register(ContactUs, ContactAdmin)

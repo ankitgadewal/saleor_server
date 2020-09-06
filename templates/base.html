@@ -144,12 +144,6 @@
 
           {% endif %}
           <li class="nav-item">
-            <!-- <a href="https://github.com/ankitgadewal/Saleor_Restaurant_Django"
-              class="nav-link border border-light rounded waves-effect" target="_blank">
-              <i class="fab fa-github mr-2"></i>Saleor GitHub
-            </a> -->
-
-
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#exampleModal">
               Search For a Dish
             </button>
@@ -179,6 +173,11 @@
                 </div>
               </div>
             </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'restaurant:contact-us' %}">
+              <span class="clearfix"> Contact Us </span>
+            </a>
           </li>
         </ul>
       </div>

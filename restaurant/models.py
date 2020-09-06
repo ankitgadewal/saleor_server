@@ -132,3 +132,12 @@ class Refund(models.Model):
 
     def __str__(self):
         return f"{self.pk}"
+
+class ContactUs(models.Model):
+    customer_name = models.CharField(max_length=50)
+    query = models.TextField()
+    mobile_no = models.IntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.customer_name}"

@@ -42,6 +42,17 @@ class CouponForm(forms.Form):
         'aria-describedby':"basic-addon2"
     }))
 
+class ContactUsForm(forms.Form):
+    name = forms.CharField(max_length=50)
+    query = forms.CharField(widget=forms.Textarea(attrs={
+        'rows': 4
+    }))
+    mobile_no = forms.IntegerField(widget=forms.TextInput(attrs={
+        'placeholder': 'Contact Number',
+        'class':'form-control'
+    }))
+    # timestamp = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'type': 'date'}))
+
 class RefundForm(forms.Form):
     ref_code = forms.CharField(widget=forms.TextInput(attrs={
         'placeholder': 'You can get order reference id from order history page',

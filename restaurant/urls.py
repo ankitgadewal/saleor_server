@@ -21,4 +21,5 @@ urlpatterns = [
     path('purchase/handle_request/', views.handle_paytm_request, name="handle_paytm_request"),
     path('payment-method', views.PaymentMehodView.as_view(), name="payment-method"),
     path('search', views.SearchView.as_view(), name='search'),
+    path('contact-us', views.ContactUsView.as_view(), name='contact-us'),
 ]

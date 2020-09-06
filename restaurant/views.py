@@ -1,13 +1,13 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.views.generic import ListView, DetailView, View, TemplateView
-from .models import Item, Order, OrderItem, BillingAddress, Payment, Coupon, Refund
+from .models import Item, Order, OrderItem, BillingAddress, Payment, Coupon, Refund, ContactUs
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
-from . forms import CheckoutForm, UserUpdateForm, CouponForm, RefundForm
+from . forms import CheckoutForm, UserUpdateForm, CouponForm, RefundForm, ContactUsForm
 from django.views.decorators.csrf import csrf_exempt
 from .paytm import Checksum
 from django.core.mail import send_mail
@@ -443,3 +443,29 @@ class RequestRefundView(LoginRequiredMixin, View):
             except ObjectDoesNotExist:
                 messages.info(self.request, "This order does not exist.")
                 return redirect("restaurant:request-refund")
+
+class ContactUsView(View):
+    def get(self, *args, **kwargs):
+        form = ContactUsForm()
+        context = {
+            'form': form
+        }
+        return render(self.request, "restaurant/contact-us.html", context)
+
+    def post(self, *args, **kwargs):
+        form = ContactUsForm(self.request.POST)
+        if form.is_valid():
+            name = form.cleaned_data.get('name')
+            query = form.cleaned_data.get('query')
+            mobile_no = form.cleaned_data.get('mobile_no')
+            contactus = ContactUs()
+            contactus.customer_name = name
+            contactus.query = query
+            contactus.mobile_no = mobile_no
+            contactus.save()
+            messages.success(self.request, "Your request was received. we will resolve your query asap")
+            return redirect("restaurant:contact-us")
+        else:
+            messages.warning(self.request, "Something went wrong please Fill The Form Correctly")
+            return redirect("restaurant:contact-us")
+
