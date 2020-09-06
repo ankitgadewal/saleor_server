@@ -8,14 +8,54 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from . forms import CheckoutForm, UserUpdateForm, CouponForm, RefundForm
+from django.views.decorators.csrf import csrf_exempt
+from .paytm import Checksum
 from django.core.mail import send_mail
 import stripe
 import random
 import string
 stripe.api_key = settings.STRIPE_SECRET_KEY
+MERCHANT_KEY = 'yLtLHOrBIro7O@j4'
 
 def create_ref_code():
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
+
+class PaytmPaymentView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        print(self.request.user.username)
+        order = Order.objects.get(user=self.request.user, ordered=False)
+        params_dict = {
+                'MID':'wgyjVw30068262008394',
+                'ORDER_ID': create_ref_code(),
+                'TXN_AMOUNT':str(order.get_total()),
+                'CUST_ID':self.request.user.email,
+                'INDUSTRY_TYPE_ID':'Retail',
+                'WEBSITE':'WEBSTAGING',
+                'CHANNEL_ID':'WEB',
+                'CALLBACK_URL':'http://127.0.0.1:8000/purchase/handle_request/',
+            }
+        params_dict['CHECKSUMHASH'] = Checksum.generate_checksum(params_dict, MERCHANT_KEY)
+        params_dict['user'] = str(self.request.user.username)
+        return render(self.request, 'restaurant/paytmpayment.html', {'params_dict':params_dict})
+
+@csrf_exempt
+def handle_paytm_request(request):
+    form = request.POST
+    response_dict = {}
+    for i in form.keys():
+        response_dict[i] = form[i]
+        if i == 'CHECKSUMHASH':
+            checksum = form[i]
+
+    verify = Checksum.verify_checksum(response_dict, MERCHANT_KEY, checksum)
+    if verify:
+        if response_dict['RESPCODE'] == '01':
+            return render(request, 'restaurant/paymentstatus.html', {'response': response_dict})
+            # newpremium = Premium(order_id=order_id, charge=int(charge))
+            # newpremium.save()
+        else:
+            print('order was not successful because of '+ response_dict['RESPMSG'])
+            return render(request, 'restaurant/paymentstatus.html', {'response': response_dict})
 
 
 class HomeView(ListView):
@@ -82,7 +122,7 @@ class CheckoutView(LoginRequiredMixin, View):
                 billing_address.save()
                 order.billing_address = billing_address
                 order.save()
-                return redirect('restaurant:payment')
+                return redirect('restaurant:payment-method')
             messages.info(self.request, 'checkout failed')
             return redirect('restaurant:checkOut')
 
@@ -97,7 +137,11 @@ def save_addr(request):
     order = Order.objects.get(user=request.user, ordered=False)
     order.billing_address = found_address
     order.save()
-    return redirect('restaurant:payment')
+    return redirect('restaurant:payment-method')
+
+class PaymentMehodView(View):
+    def get(self, *args, **kwargs):
+        return render(self.request, 'restaurant/payment_choices.html')
 
 
 class PaymentView(LoginRequiredMixin, View):

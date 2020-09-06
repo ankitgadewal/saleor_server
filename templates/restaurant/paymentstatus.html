@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block body %}
+
+
+<!-- {'CURRENCY': 'INR', 'GATEWAYNAME': 'WALLET', 'RESPMSG': 'Txn Success', 'BANKNAME': 'WALLET', 'PAYMENTMODE': 'PPI', 'MID': 'wgyjVw30068262008394', 'RESPCODE': '01', 'TXNID': '20200512111212800110168145401528269', 'TXNAMOUNT': '5250.00', 'ORDERID': '177397', 'STATUS': 'TXN_SUCCESS', 'BANKTXNID': '62434205', 'TXNDATE': '2020-05-12 20:21:14.0'}  -->
+
+    {% if response.RESPCODE == '01' %}
+    <div class="col-sm-12 col-lg-4 mt-4">
+        <h2 class="h3">Payment Success Order Successfully Placed</h2>
+        <table class="table table-bordered text-dark">
+            <tr>
+                <th>Payment Status</th>
+                <td>{{response.RESPMSG}}</td>
+              </tr>
+              <tr>
+                <th>Transaction ID</th>
+                <td>{{response.TXNID}}</td>
+              </tr>
+              <tr>
+                <th>OrderID</th>
+                <td>{{response.ORDERID}}</td>
+              </tr>
+              <tr>
+                <th>Amount</th>
+                <td>{{response.TXNAMOUNT}}/-</td>
+              </tr>
+          </table>
+        </div>
+    {% else %}
+    <div class="col-sm-12 col-lg-4 mt-4">
+        <h2 class="h3 text-center">Purchase Failed</h2>
+        <table class="table table-bordered text-dark text-center">
+            <tr>
+                <th>Payment Status</th>
+                <td>{{response.RESPMSG}}</td>
+              </tr>
+              <tr>
+                <th>Transaction ID</th>
+                <td>{{response.TXNID}}</td>
+              </tr>
+              <tr>
+                <th>OrderID</th>
+                <td>{{response.ORDERID}}</td>
+              </tr>
+              <tr>
+                <th>Amount</th>
+                <td>{{response.TXNAMOUNT}}/-</td>
+              </tr>
+          </table>
+        </div>
+    {% endif %}
+    
+{% endblock body %}

@@ -140,6 +140,10 @@
                 <button id="stripeBtn">Submit Payment</button>
               </form>
             </div>
+
+            <hr>
+            
+            <a href="{% url 'restaurant:paytm-payment' %}">or Pay with PayTm</a>
             <div id="stripe-token-handler" class="is-hidden"><span class="token"></span></div>
 
             <script src="https://js.stripe.com/v3/"></script>

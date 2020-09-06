@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body %}
+    <h3>Redirecting you to payment page...</h3>
+    <h2>Please do not refresh your page</h2>
+    <form action="https://securegw-stage.paytm.in/order/process/" method="post" name="paytm">
+        {% for key, value in params_dict.items %}
+        <input type="hidden" name="{{key}}" value="{{value}}">
+        {% endfor %}
+    </form>
+    <script>
+        document.paytm.submit()
+    </script>
+{% endblock body %}

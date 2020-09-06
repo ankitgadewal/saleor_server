@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block body %}
+<main>
+  <div class="container">
+    <section class="mb-4 mt-2">
+      <div class="row fadeIn wow">
+        <div class="col-sm-12 col-lg-6">
+        <h2 class="h2">Select Payment Method</h2>
+        <a href="{% url 'restaurant:payment' %}" class="btn btn-primary">Pay with Stripe</a><br>
+        <a href="{% url 'restaurant:paytm-payment' %}" class="btn btn-default">Pay with Paytm</a><br>
+        <a href="#" class="btn btn-secondary">Pay with Paypal</a>
+      </div>
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock %}

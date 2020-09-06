@@ -15,6 +15,9 @@ urlpatterns = [
     path('payment/stripe/', views.PaymentView.as_view(), name="payment"),
     path('profile', views.ProfileView.as_view(), name="profile"),
     path('add-coupon/', views.AddCouponView.as_view(), name="add-coupon"),
-    path('revove-coupon/', views.RemoveCouponView.as_view(), name="remove-coupon"),
+    path('remove-coupon/', views.RemoveCouponView.as_view(), name="remove-coupon"),
     path('request-refund', views.RequestRefundView.as_view(), name="request-refund"),
+    path('paytm-payment', views.PaytmPaymentView.as_view(), name="paytm-payment"),
+    path('purchase/handle_request/', views.handle_paytm_request, name="handle_paytm_request"),
+    path('payment-method', views.PaymentMehodView.as_view(), name="payment-method"),
 ]
