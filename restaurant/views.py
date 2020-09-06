@@ -213,50 +213,40 @@ class PaymentView(LoginRequiredMixin, View):
             send_mail(
                 'Congratulations!! Order placed',
                 f'hello sir we are very happy to say that your order is suucessfully placed and we received Rs {payment.amount} Your order will be deliverd asap Happy Shopping.',
-                'ankitgadewal11@gmail.com',
-                ['alkeshk99@gmail.com'],
+                'ankitgadewal.84@gmail.com',
+                [self.request.user.email],
                 fail_silently=False,
             )
             messages.success(self.request, "your payment was sucessful")
-            return redirect('/')
 
         except stripe.error.CardError as e:
-            messages.error(self.request, e.error.message)
-            return redirect('/')
+            messages.warning(self.request, e.error.message)
 
         except stripe.error.RateLimitError as e:
             # Too many requests made to the API too quickly
-            messages.error(self.request, "rate limit error")
-            return redirect('/')
+            messages.warning(self.request, "rate limit error")
 
         except stripe.error.InvalidRequestError as e:
             # Invalid parameters were supplied to Stripe's API
             messages.warning(self.request, "invalid request")
-            return redirect('/')
 
         except stripe.error.AuthenticationError as e:
             # Authentication with Stripe's API failed
             # (maybe you changed API keys recently)
-            messages.error(self.request, "authentication error")
-            return redirect('/')
+            messages.warning(self.request, "authentication error")
 
         except stripe.error.APIConnectionError as e:
             # Network communication with Stripe failed
-            messages.error(self.request, "connection problem")
-            return redirect('/')
+            messages.warning(self.request, "connection problem")
 
         except stripe.error.StripeError as e:
             # Display a very generic error to the user, and maybe send
-            # yourself an email
-            messages.error(self.request, "something went wrong...")
-            return redirect('/')
+            messages.warning(self.request, "something went wrong...")
 
         except Exception as e:
             # Something else happened, completely unrelated to Stripe
-            messages.error(
-                self.request, "something serious error, we will be notified...")
-            return redirect('/')
-
+            messages.error(self.request, "something serious error, we will be notified...")
+        return redirect('/')
 
 class DishDetailView(DetailView):
     model = Item
@@ -437,6 +427,14 @@ class RequestRefundView(LoginRequiredMixin, View):
                 refund.email = email
                 refund.save()
 
+                send_mail(
+                'Received Your Refund Request',
+                f'Hello {self.request.user.username}, we have received a refund request against your ref_code {ref_code}. ThankYou',
+                'ankitgadewal.84@gmail.com',
+                [self.request.user.email],
+                fail_silently=False,
+                )
+
                 messages.info(self.request, "Your request was received.")
                 return redirect("restaurant:request-refund")
 
@@ -463,6 +461,14 @@ class ContactUsView(View):
             contactus.query = query
             contactus.mobile_no = mobile_no
             contactus.save()
+
+            send_mail(
+                'Received Your Request',
+                f'we will try to solve your issue as soon as possible',
+                'ankitgadewal.84@gmail.com',
+                [self.request.user.email],
+                fail_silently=False,
+            )
             messages.success(self.request, "Your request was received. we will resolve your query asap")
             return redirect("restaurant:contact-us")
         else:
