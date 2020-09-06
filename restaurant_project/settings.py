@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
     'allauth.socialaccount.providers.twitter',
+    'allauth.socialaccount.providers.google',
     'crispy_forms',
     'django_countries',
     'restaurant'
@@ -102,13 +103,26 @@ SOCIALACCOUNT_PROVIDERS = \
         'EXCHANGE_TOKEN': True,
         'LOCALE_FUNC': lambda request: 'kr_KR',
         'VERIFIED_EMAIL': False,
-        'VERSION': 'v2.4'}}
+        'VERSION': 'v2.4'},
+
+        'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }}
 
 SOCIAL_AUTH_FACEBOOK_KEY = '333372524478232'
 SOCIAL_AUTH_FACEBOOK_SECRET = 'b5af6c66a9a5c1b4979503c57541f514'
 
 SOCIAL_AUTH_TWITTER_KEY = '77E6svnd7nG0VTEtEUxanGp05' 
 SOCIAL_AUTH_TWITTER_SECRET = 'Tb1O9IWUXRBY8XmzPVxefAyaE6fuBpZpXWiufzL6io7dLRdg2w'
+
+SOCIAL_AUTH_GOOGLE_KEY = '934817289116-02uaetraart8mk91mfnbep52u4jah3vo.apps.googleusercontent.com' 
+SOCIAL_AUTH_GOOGLE_SECRET = 'xSB4lFmTW5vbIjwguDOwxqC2'
 
 LANGUAGE_CODE = 'en-us'
 
