@@ -182,11 +182,10 @@ class PaymentView(LoginRequiredMixin, View):
             return redirect('/')
 
     def post(self, *args, **kwargs):
-        order = Order.objects.get(user=self.request.user, ordered=False)
-        token = self.request.POST.get('stripeToken')
-        amount = int(order.get_total())
-
         try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            token = self.request.POST.get('stripeToken')
+            amount = int(order.get_total())
             charge = stripe.Charge.create(
                 amount=amount,
                 currency="inr",
