@@ -281,7 +281,7 @@ class OrderSummaryView(LoginRequiredMixin, View):
             order = Order.objects.get(user=self.request.user, ordered=False)
             return render(self.request, 'restaurant/order-summary.html', {'object': order})
         except ObjectDoesNotExist:
-            messages.danger(self.request, "Your cart is empty")
+            messages.warning(self.request, "Your cart is empty")
             return redirect('/')
         return render(self.request, 'restaurant/order-summary.html')
 
