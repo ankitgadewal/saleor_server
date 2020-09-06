@@ -17,26 +17,30 @@ import string
 stripe.api_key = settings.STRIPE_SECRET_KEY
 MERCHANT_KEY = 'yLtLHOrBIro7O@j4'
 
+
 def create_ref_code():
     return ''.join(random.choices(string.ascii_lowercase + string.digits, k=20))
+
 
 class PaytmPaymentView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         print(self.request.user.username)
         order = Order.objects.get(user=self.request.user, ordered=False)
         params_dict = {
-                'MID':'wgyjVw30068262008394',
-                'ORDER_ID': create_ref_code(),
-                'TXN_AMOUNT':str(order.get_total()),
-                'CUST_ID':self.request.user.email,
-                'INDUSTRY_TYPE_ID':'Retail',
-                'WEBSITE':'WEBSTAGING',
-                'CHANNEL_ID':'WEB',
-                'CALLBACK_URL':'https://ankitgadewal16.pythonanywhere.com/purchase/handle_request/',
-            }
-        params_dict['CHECKSUMHASH'] = Checksum.generate_checksum(params_dict, MERCHANT_KEY)
+            'MID': 'wgyjVw30068262008394',
+            'ORDER_ID': create_ref_code(),
+            'TXN_AMOUNT': str(order.get_total()),
+            'CUST_ID': self.request.user.email,
+            'INDUSTRY_TYPE_ID': 'Retail',
+            'WEBSITE': 'WEBSTAGING',
+            'CHANNEL_ID': 'WEB',
+            'CALLBACK_URL': 'https://ankitgadewal16.pythonanywhere.com/purchase/handle_request/',
+        }
+        params_dict['CHECKSUMHASH'] = Checksum.generate_checksum(
+            params_dict, MERCHANT_KEY)
         params_dict['user'] = str(self.request.user.username)
-        return render(self.request, 'restaurant/paytmpayment.html', {'params_dict':params_dict})
+        return render(self.request, 'restaurant/paytmpayment.html', {'params_dict': params_dict})
+
 
 @csrf_exempt
 def handle_paytm_request(request):
@@ -54,13 +58,27 @@ def handle_paytm_request(request):
             # newpremium = Premium(order_id=order_id, charge=int(charge))
             # newpremium.save()
         else:
-            print('order was not successful because of '+ response_dict['RESPMSG'])
+            print('order was not successful because of ' +
+                  response_dict['RESPMSG'])
             return render(request, 'restaurant/paymentstatus.html', {'response': response_dict})
 
 
 class HomeView(ListView):
     model = Item
     template_name = 'restaurant/home-page.html'
+
+
+class SearchView(ListView):
+    model = Item
+    template_name = 'restaurant/search.html'
+
+    def get_queryset(self):
+        query = self.request.GET['query']
+        if len(query) > 50 or len(query) < 1:
+            dishes = []
+        else:
+            dishes = Item.objects.filter(title__icontains=query)
+        return dishes
 
 
 class ProfileView(LoginRequiredMixin, View):
@@ -97,7 +115,7 @@ class CheckoutView(LoginRequiredMixin, View):
                 return render(self.request, 'restaurant/checkout-page.html', context)
             else:
                 messages.warning(
-                self.request, 'please add some items to your cart before checkout')
+                    self.request, 'please add some items to your cart before checkout')
                 return redirect('/')
         except ObjectDoesNotExist:
             messages.warning(
@@ -142,6 +160,7 @@ def save_addr(request):
     order.billing_address = found_address
     order.save()
     return redirect('restaurant:payment-method')
+
 
 class PaymentMehodView(View):
     def get(self, *args, **kwargs):
@@ -384,6 +403,7 @@ class AddCouponView(View):
                     self.request, f"The Coupon {order.coupon} is invalid or Expired")
                 return redirect("restaurant:checkOut")
 
+
 class RemoveCouponView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         order = Order.objects.get(user=self.request.user, ordered=False)
@@ -391,6 +411,7 @@ class RemoveCouponView(LoginRequiredMixin, View):
         order.save()
         messages.success(self.request, f"promocode removed")
         return redirect("restaurant:checkOut")
+
 
 class RequestRefundView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):

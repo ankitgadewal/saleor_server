@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block body %}
+{% load static %}
+<div class="container">
+  <div class="row">
+
+
+    {% if object_list|length < 1 %}
+    <div class="row">
+        <div class="col-md-2">
+        <img src="https://i.pinimg.com/originals/4d/a6/21/4da621ccbff390850d1e1978bf5117d4.png" class="img-fluid mt-2">
+       
+        </div>
+        <div class="col-md-8"> <h3 class="h3 mt-5 text-center"> your search query didn't Match any blog Please Try different keywords </p></div>
+    </div>
+    {% else %}
+
+
+    {% for item in object_list %}
+    <div class="col-lg-4 col-md-12">
+
+      <h4 class="py-2 text-center"></h4>
+      <div class="card card-cascade wider">
+        <div class="view view-cascade">
+          <img src="{{item.image_url}}" class="card-img-top">
+          <a href="{{item.get_absolute_url}}">
+            <div class="mask rgba-white-slight"></div>
+          </a>
+        </div>
+
+        <div class="card-body card-body-cascade text-center">
+          <h4 class="card-title"><strong>{{item.title}}</strong></h4>
+          <h5 class="indigo-text"><strong>{{item.veg_or_nonveg}}</strong></h5>
+          {% if item.discount_price %}
+          <h5>Only For <span>Rs. <del>{{item.price}}</del> Rs.{{item.discount_price}}/- </span></h5>
+          {% else %}
+          <h5>Only For <span>Rs. {{item.price}}/- </span></h5>
+          {% endif %}
+          <p>price for {{item.quantity}} {{item.title}}</p>
+          <form action="{{ item.get_add_to_cart_url }}">
+          <button class="btn btn-unique" type="submit">Add to Cart</button>
+          </form>
+          <p class="card-text">
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+{% endblock body %}
+
