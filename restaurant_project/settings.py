@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.twitter',
     'crispy_forms',
     'django_countries',
     'restaurant'
@@ -105,6 +106,9 @@ SOCIALACCOUNT_PROVIDERS = \
 
 SOCIAL_AUTH_FACEBOOK_KEY = '333372524478232'
 SOCIAL_AUTH_FACEBOOK_SECRET = 'b5af6c66a9a5c1b4979503c57541f514'
+
+SOCIAL_AUTH_TWITTER_KEY = '77E6svnd7nG0VTEtEUxanGp05' 
+SOCIAL_AUTH_TWITTER_SECRET = 'Tb1O9IWUXRBY8XmzPVxefAyaE6fuBpZpXWiufzL6io7dLRdg2w'
 
 LANGUAGE_CODE = 'en-us'
 
