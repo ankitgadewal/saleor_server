@@ -2,48 +2,51 @@
 {% load crispy_forms_tags %}
 {% block body %}
 <main>
-    <div class="container-fluid">
-        <section class="mb-4 mt-2">
-            <div class="row fadeIn wow">
-                <div class="col-sm-12 col-lg-12">
-                    <table class="table">
-                        <thead>
-                          <tr>
-                            <th scope="col">S.no</th>
-                            <th scope="col">Items</th>
-                            <th scope="col">ref_code</th>
-                            <th scope="col">Order Date</th>
-                            <th scope="col">Address</th>
-                            <th scope="col">Payment</th>
-                            <th scope="col">Applied Coupon</th>
-                            <th scope="col">Order Status</th>
-                          </tr>
-                        </thead>
-                        {% for item in orderitem %}
-                        <tbody>
-                          <tr>
-                            <th scope="row">{{forloop.counter}}</th>
-                            <th>
-                            {% for i in item.items.all %}
-                              <p> {{i.cartitem}} x {{i}}</p>
-                            {% endfor %}
-                          </th>
-                            <td>{{item.ref_code}}</td>
-                            <td>{{item.order_date}}</td>
-                            <td>{{item.billing_address}}</td>
-                            <td>{{item.payment.amount}}/-</td>
-                            <td>{{item.coupon}}</td>
-                            <td>{{item.status}}</td>
-                          </tr>
-                        </tbody>
-                        {% endfor %}
-                      </table>
-                    
-                    
-                    
-                </div>
-            </div>
-        </section>
-    </div>
+  <div class="container mt-4">
+    <section class="mb-4 mt-2">
+      <div class="row fadeIn wow">       
+          {% for item in orderitem %}
+          <div class="col-sm-12 col-lg-4">
+          <table class="table table-bordered text-dark text-center">
+            <tr>
+              <th>Order Date</th>
+              <td>{{item.order_date}}</td>
+            </tr>
+            <tr>
+              <th>Items</th>
+              <td>{% for i in item.items.all %}
+                <p> {{i.cartitem}} x {{i}}</p>
+                {% endfor %}</td>
+            </tr>
+            <tr>
+              <th>ref_code</th>
+              <td>{{item.ref_code}}</td>
+            </tr>
+            <tr>
+              <th>Address</th>
+              <td>{{item.billing_address}}</td>
+            </tr>
+            <tr>
+              <th>Amount Paid</th>
+              <td>{{item.payment.amount}}/-</td>
+            </tr>
+            <tr>
+              <th>Address</th>
+              <td>{{item.billing_address}}</td>
+            </tr>
+            <tr>
+              <th>Applied Coupon</th>
+              <td>{{item.coupon}}</td>
+            </tr>
+            <tr>
+              <th>Order Status</th>
+              <td>{{item.status}}</td>
+            </tr>
+          </table>
+        </div>
+          {% endfor %}
+      </div>
+    </section>
+  </div>
 </main>
 {% endblock %}

@@ -93,8 +93,12 @@ class CheckoutView(LoginRequiredMixin, View):
             oldaddress = BillingAddress.objects.filter(user=self.request.user)
             if oldaddress.exists():
                 context.update({'oldaddress': oldaddress[0]})
-
-            return render(self.request, 'restaurant/checkout-page.html', context)
+            if order.get_total() > 0:
+                return render(self.request, 'restaurant/checkout-page.html', context)
+            else:
+                messages.warning(
+                self.request, 'please add some items to your cart before checkout')
+                return redirect('/')
         except ObjectDoesNotExist:
             messages.warning(
                 self.request, 'please add some items to your cart before checkout')
@@ -127,7 +131,7 @@ class CheckoutView(LoginRequiredMixin, View):
             return redirect('restaurant:checkOut')
 
         except ObjectDoesNotExist:
-            messages.error(self.request, "Your cart is empty")
+            messages.warning(self.request, "Your cart is empty")
             return redirect('restaurant:order-summary')
 
 
@@ -258,7 +262,7 @@ class OrderSummaryView(LoginRequiredMixin, View):
             order = Order.objects.get(user=self.request.user, ordered=False)
             return render(self.request, 'restaurant/order-summary.html', {'object': order})
         except ObjectDoesNotExist:
-            messages.error(self.request, "Your cart is empty")
+            messages.danger(self.request, "Your cart is empty")
             return redirect('/')
         return render(self.request, 'restaurant/order-summary.html')
 
