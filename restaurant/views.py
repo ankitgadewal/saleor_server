@@ -32,7 +32,7 @@ class PaytmPaymentView(LoginRequiredMixin, View):
                 'INDUSTRY_TYPE_ID':'Retail',
                 'WEBSITE':'WEBSTAGING',
                 'CHANNEL_ID':'WEB',
-                'CALLBACK_URL':'http://127.0.0.1:8000/purchase/handle_request/',
+                'CALLBACK_URL':'https://ankitgadewal16.pythonanywhere.com/purchase/handle_request/',
             }
         params_dict['CHECKSUMHASH'] = Checksum.generate_checksum(params_dict, MERCHANT_KEY)
         params_dict['user'] = str(self.request.user.username)
