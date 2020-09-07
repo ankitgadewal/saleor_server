@@ -65,10 +65,13 @@ class OrderItemsAdmin(admin.ModelAdmin):
 
 class PaymentAdmin(admin.ModelAdmin):
     list_display = [
-        'stripe_charge_id',
+        'charge_id',
         'user',
         'amount',
-        'timestamp'
+        'payment_mode',
+        'transaction_date',
+        'payment_status',
+        'bank_txn_id'
     ]
 
 

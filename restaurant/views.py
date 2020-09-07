@@ -11,7 +11,6 @@ from . forms import CheckoutForm, UserUpdateForm, CouponForm, RefundForm, Contac
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from .paytm import Checksum
 from django.core.mail import send_mail
-from django.utils.decorators import method_decorator
 import stripe
 import time
 import random
@@ -26,10 +25,14 @@ def create_ref_code():
 class PaytmPaymentView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         order = Order.objects.get(user=self.request.user, ordered=False)
+        new_ref_code = create_ref_code()
+        order.ref_code = new_ref_code
+        orderamount = order.get_total()
+        order.save()
         
         params_dict = {
             'MID': 'wgyjVw30068262008394',
-            'ORDER_ID': create_ref_code(),
+            'ORDER_ID': new_ref_code,
             'TXN_AMOUNT': str(order.get_total()),
             'CUST_ID': self.request.user.email,
             'INDUSTRY_TYPE_ID': 'Retail',
@@ -38,7 +41,9 @@ class PaytmPaymentView(LoginRequiredMixin, View):
             'CALLBACK_URL': 'http://127.0.0.1:8000/purchase/handle_request/',
         }
         params_dict['CHECKSUMHASH'] = Checksum.generate_checksum(params_dict, MERCHANT_KEY)
-        params_dict['user_id'] = str(self.request.user.id)
+
+        newpayment = Payment(user=self.request.user, charge_id=new_ref_code, amount=orderamount)
+        newpayment.save()
         return render(self.request, 'restaurant/paytmpayment.html', {'params_dict': params_dict})
 
 @csrf_exempt
@@ -49,13 +54,33 @@ def handle_paytm_request(request):
         response_dict[i] = form[i]
         if i == 'CHECKSUMHASH':
             checksum = form[i]
+
     try:
         verify = Checksum.verify_checksum(response_dict, MERCHANT_KEY, checksum)
+        current_order = Order.objects.get(ref_code=response_dict['ORDERID'])
+        current_payment = Payment.objects.get(charge_id=response_dict['ORDERID'])
+        current_payment.payment_mode = 'PayTm'
+        
+        order_items = current_order.items.all()
+        order_items.update(ordered=True)
+        for item in order_items:
+            item.save()
+
+        current_payment.transaction_id = response_dict['TXNID']
+        current_payment.transaction_date =response_dict['TXNDATE']
+        current_payment.bank_txn_id = response_dict['BANKTXNID']
+                
         if verify:
             if response_dict['RESPCODE'] == '01':
+                
+                current_payment.payment_status = True
+                current_payment.save()
+                current_order.ordered = True
+                current_order.save()
                 messages.success(request, 'Order Placed!! Payment Successful')
                 return render(request, 'restaurant/paymentstatus.html', {'response': response_dict})
             else:
+                current_payment.save()
                 messages.warning(request, 'Order was unsuccessful!! Please Try again')
                 return render(request, 'restaurant/paymentstatus.html', {'response': response_dict})
     except Exception as e:
@@ -181,7 +206,7 @@ class PaymentView(LoginRequiredMixin, View):
         try:
             order = Order.objects.get(user=self.request.user, ordered=False)
             token = self.request.POST.get('stripeToken')
-            amount = int(order.get_total())
+            amount = int(order.get_total()*100)
             charge = stripe.Charge.create(
                 amount=amount,
                 currency="inr",
@@ -191,9 +216,12 @@ class PaymentView(LoginRequiredMixin, View):
             # save payments to our database
             payment = Payment()
 
-            payment.stripe_charge_id = charge['id']
+            payment.charge_id = charge['id']
             payment.amount = order.get_total()
             payment.user = self.request.user
+            payment.payment_status = True
+            payment.payment_mode = 'stripe'
+            payment.transaction_date =  timezone.localtime(timezone.now())
             payment.save()
 
             order_items = order.items.all()
@@ -225,7 +253,7 @@ class PaymentView(LoginRequiredMixin, View):
 
         except stripe.error.InvalidRequestError as e:
             # Invalid parameters were supplied to Stripe's API
-            messages.warning(self.request, "invalid request")
+            messages.warning(self.request, e.error.message)
 
         except stripe.error.AuthenticationError as e:
             # Authentication with Stripe's API failed
@@ -249,7 +277,6 @@ class DishDetailView(DetailView):
     model = Item
     template_name = 'restaurant/dish-page.html'
     context_object_name = 'item'
-
 
 class MyOrdersView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):

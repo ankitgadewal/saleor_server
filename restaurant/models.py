@@ -75,6 +75,7 @@ class Order(models.Model):
     ordered = models.BooleanField(default=False)
     billing_address = models.ForeignKey('BillingAddress', on_delete=models.SET_NULL, blank=True, null=True)
     payment = models.ForeignKey('Payment', on_delete=models.SET_NULL, blank=True, null=True)
+    paytm_payment_id = models.CharField(max_length=100, null=True, blank=True)
     coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL, blank=True, null=True)
     status = models.CharField(max_length=50, choices=order_status, default='not_accepted')
     refund_requested = models.BooleanField(default=False)
@@ -106,14 +107,27 @@ class BillingAddress(models.Model):
     class Meta:
         verbose_name_plural = 'Addresses'
 
+# class Payment(models.Model):
+#     stripe_charge_id = models.CharField(max_length=100)
+#     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True)
+#     amount = models.FloatField()
+#     timestamp = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return self.stripe_charge_id
+
 class Payment(models.Model):
-    stripe_charge_id = models.CharField(max_length=100)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True)
+    charge_id = models.CharField(max_length=100)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     amount = models.FloatField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    payment_mode = models.CharField(max_length=50, blank=True, null=True)
+    transaction_id = models.CharField(max_length=100, blank=True, null=True)
+    payment_status = models.BooleanField(default=False)
+    transaction_date = models.DateTimeField(blank=True, null=True)
+    bank_txn_id = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
-        return self.stripe_charge_id
+        return self.user.username
 
 class Coupon(models.Model):
     code = models.CharField(max_length=15)
@@ -144,3 +158,6 @@ class ContactUs(models.Model):
 
     class Meta:
         verbose_name_plural = 'Contact Us'
+
+
+
