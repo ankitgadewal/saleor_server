@@ -24,6 +24,7 @@
           <h5>Only For <span>Rs. {{item.price}}/- </span></h5>
           {% endif %}
           <p>price for {{item.quantity}} {{item.title}}</p>
+
           <form action="{{ item.get_add_to_cart_url }}">
           <button class="btn btn-unique" type="submit">Add to Cart</button>
           </form>

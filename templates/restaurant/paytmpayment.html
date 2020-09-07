@@ -1,13 +1,26 @@
 {% extends "base.html" %}
 {% block body %}
-    <h3>Redirecting you to payment page...</h3>
-    <h2>Please do not refresh your page</h2>
-    <form action="https://securegw-stage.paytm.in/order/process/" method="post" name="paytm">
-        {% for key, value in params_dict.items %}
-        <input type="hidden" name="{{key}}" value="{{value}}">
-        {% endfor %}
-    </form>
-    <script>
-        document.paytm.submit()
-    </script>
+<main>
+    <div class="container mt-5">
+        <section class="mb-4 mt-2">
+            <div class="row fadeIn wow">
+                <div class="col-sm-12 col-lg-6">
+                    <h3 class="h3">Redirecting you to payment page...</h3>
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <h2>Please do not refresh your page</h2>
+                    <form action="https://securegw-stage.paytm.in/order/process/" method="post" name="paytm">
+                        {% for key, value in params_dict.items %}
+                        <input type="hidden" name="{{key}}" value="{{value}}">
+                        {% endfor %}
+                    </form>
+                    <script>
+                        document.paytm.submit()
+                    </script>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
 {% endblock body %}
